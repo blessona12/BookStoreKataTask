@@ -35,4 +35,9 @@ class PricingServiceTest {
     void testThreeDifferentBooks() {
         assertEquals(135.0, service.calculate(new int[]{1, 1, 1, 0, 0}), 0.001);
     }
+
+    @Test
+    void testFiveDifferentBooks() {
+        assertEquals(187.5, service.calculate(new int[]{1, 1, 1, 1, 1}), 0.001);
+    }
 }
