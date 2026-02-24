@@ -40,4 +40,9 @@ class PricingServiceTest {
     void testFiveDifferentBooks() {
         assertEquals(187.5, service.calculate(new int[]{1, 1, 1, 1, 1}), 0.001);
     }
+
+    @Test
+    void testSimpleMixedBasket() {
+        assertEquals(145.0, service.calculate(new int[]{2, 1, 0, 0, 0}), 0.001);
+    }
 }

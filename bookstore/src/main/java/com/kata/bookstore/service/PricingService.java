@@ -14,26 +14,43 @@ public class PricingService {
         }
 
         int totalBooks = 0;
-        int distinctBooks = 0;
-
         for (int count : counts) {
             totalBooks += count;
-            if (count > 0) {
-                distinctBooks++;
-            }
         }
 
         if (totalBooks == 0) {
             return 0.0;
         }
 
-        // If all books are distinct (single set), apply discount
-        if (totalBooks == distinctBooks) {
-            double discount = DISCOUNT_RATES[distinctBooks];
-            return totalBooks * BOOK_PRICE * (1 - discount);
+        // Make a working copy so we don't modify original array
+        int[] currentCounts = counts.clone();
+        double totalCost = 0.0;
+
+        while (true) {
+            // Count how many different books still have copies left
+            int distinct = 0;
+            for (int c : currentCounts) {
+                if (c > 0) {
+                    distinct++;
+                }
+            }
+
+            if (distinct == 0) {
+                break;   // no more books
+            }
+
+            // Apply discount for this group
+            double discount = DISCOUNT_RATES[distinct];
+            totalCost += distinct * BOOK_PRICE * (1 - discount);
+
+            // Remove one copy from each book that still has some
+            for (int i = 0; i < currentCounts.length; i++) {
+                if (currentCounts[i] > 0) {
+                    currentCounts[i]--;
+                }
+            }
         }
 
-        // No discount for duplicates yet
-        return totalBooks * BOOK_PRICE;
+        return totalCost;
     }
 }
