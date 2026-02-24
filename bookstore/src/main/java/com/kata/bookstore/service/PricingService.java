@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 public class PricingService {
 
     private static final double BOOK_PRICE = 50.0;
+    private static final double[] DISCOUNT_RATES = {0.0, 0.0, 0.05, 0.10, 0.20, 0.25};
 
     public double calculate(int[] counts) {
         if (counts == null || counts.length != 5) {
@@ -13,36 +14,26 @@ public class PricingService {
         }
 
         int totalBooks = 0;
+        int distinctBooks = 0;
+
         for (int count : counts) {
             totalBooks += count;
+            if (count > 0) {
+                distinctBooks++;
+            }
         }
 
         if (totalBooks == 0) {
             return 0.0;
         }
 
-        if (totalBooks == 1) {
-            return BOOK_PRICE;
-        }
-
-        int distinct = countDistinct(counts);
-
-        if (totalBooks == distinct) {
-            double discount = 0.0;
-            if (totalBooks == 2) discount = 0.05;
+        // If all books are distinct (single set), apply discount
+        if (totalBooks == distinctBooks) {
+            double discount = DISCOUNT_RATES[distinctBooks];
             return totalBooks * BOOK_PRICE * (1 - discount);
         }
 
+        // No discount for duplicates yet
         return totalBooks * BOOK_PRICE;
-    }
-
-    private int countDistinct(int[] counts) {
-        int distinct = 0;
-        for (int count : counts) {
-            if (count > 0) {
-                distinct++;
-            }
-        }
-        return distinct;
     }
 }
