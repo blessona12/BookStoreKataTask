@@ -8,8 +8,8 @@ public class PricingService {
     private static final double BOOK_PRICE = 50.0;
 
     public double calculate(int[] counts) {
-        if (counts == null || counts.length != 5) {
-            throw new IllegalArgumentException("Must provide counts for exactly 5 books");
+        if (counts == null || counts.length == 0) {
+            return 0.0;
         }
 
         int totalBooks = 0;
@@ -25,6 +25,6 @@ public class PricingService {
             return BOOK_PRICE;
         }
 
-        throw new UnsupportedOperationException("To be implemented for multiple books");
+        return totalBooks * BOOK_PRICE;
     }
 }

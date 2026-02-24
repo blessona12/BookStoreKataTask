@@ -14,11 +14,16 @@ class PricingServiceTest {
 
     @Test
     void testEmptyCart() {
-        assertEquals(0.0, service.calculate(new int[]{0, 0, 0, 0, 0}), 0.001);
+        assertEquals(0.0, service.calculate(new int[]{0}), 0.001);
     }
 
     @Test
     void testSingleBook() {
-        assertEquals(50.0, service.calculate(new int[]{1, 0, 0, 0, 0}), 0.001);
+        assertEquals(50.0, service.calculate(new int[]{1}), 0.001);
+    }
+
+    @Test
+    void testTwoBooks() {
+        assertEquals(100.0, service.calculate(new int[]{2}), 0.001);
     }
 }
