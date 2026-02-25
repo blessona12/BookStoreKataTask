@@ -45,4 +45,9 @@ class PricingServiceTest {
     void testSimpleMixedBasket() {
         assertEquals(145.0, service.calculate(new int[]{2, 1, 0, 0, 0}), 0.001);
     }
+
+    @Test
+    void testComplexBasket() {
+        assertEquals(320.0, service.calculate(new int[]{2, 2, 2, 1, 1}), 0.001);
+    }
 }

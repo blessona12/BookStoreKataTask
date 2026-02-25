@@ -2,6 +2,9 @@ package com.kata.bookstore.service;
 
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class PricingService {
 
@@ -22,28 +25,25 @@ public class PricingService {
             return 0.0;
         }
 
-        // Make a working copy so we don't modify original array
+        // Make a working copy
         int[] currentCounts = counts.clone();
-        double totalCost = 0.0;
+
+        // Collect group sizes first
+        List<Integer> groups = new ArrayList<>();
 
         while (true) {
-            // Count how many different books still have copies left
             int distinct = 0;
             for (int c : currentCounts) {
-                if (c > 0) {
-                    distinct++;
-                }
+                if (c > 0) distinct++;
             }
 
             if (distinct == 0) {
-                break;   // no more books
+                break;
             }
 
-            // Apply discount for this group
-            double discount = DISCOUNT_RATES[distinct];
-            totalCost += distinct * BOOK_PRICE * (1 - discount);
+            groups.add(distinct);
 
-            // Remove one copy from each book that still has some
+            // Remove one copy from each available book
             for (int i = 0; i < currentCounts.length; i++) {
                 if (currentCounts[i] > 0) {
                     currentCounts[i]--;
@@ -51,6 +51,24 @@ public class PricingService {
             }
         }
 
+        optimize(groups);
+
+        // Calculate final price
+        double totalCost = 0.0;
+        for (int size : groups) {
+            double discount = DISCOUNT_RATES[size];
+            totalCost += size * BOOK_PRICE * (1 - discount);
+        }
+
         return totalCost;
+    }
+
+    private void optimize(List<Integer> groups) {
+        while (groups.contains(5) && groups.contains(3)) {
+            groups.remove(Integer.valueOf(5));
+            groups.remove(Integer.valueOf(3));
+            groups.add(4);
+            groups.add(4);
+        }
     }
 }
