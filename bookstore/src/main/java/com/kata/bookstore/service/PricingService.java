@@ -21,11 +21,7 @@ public class PricingService {
             throw new IllegalArgumentException("Must provide counts for exactly 5 books");
         }
 
-        int totalBooks = 0;
-        for (int count : counts) {
-            totalBooks += count;
-        }
-
+        int totalBooks = sum(counts);
         if (totalBooks == 0) {
             return 0.0;
         }
@@ -34,39 +30,52 @@ public class PricingService {
         List<Integer> groups = new ArrayList<>();
 
         while (true) {
-            int distinct = 0;
-            for (int c : currentCounts) {
-                if (c > 0) distinct++;
-            }
-
+            int distinct = countDistinct(currentCounts);
             if (distinct == 0) break;
 
             groups.add(distinct);
-
-            for (int i = 0; i < currentCounts.length; i++) {
-                if (currentCounts[i] > 0) {
-                    currentCounts[i]--;
-                }
-            }
+            decrementOneFromEach(currentCounts);
         }
 
         optimize(groups);
 
-        double totalCost = 0.0;
-        for (int size : groups) {
-            double discount = properties.getDiscounts().getOrDefault(size, 0.0);
-            totalCost += size * BOOK_PRICE * (1 - discount);
-        }
+        return calculateTotalCost(groups);
+    }
 
-        return totalCost;
+    private int sum(int[] counts) {
+        int total = 0;
+        for (int c : counts) total += c;
+        return total;
+    }
+
+    private int countDistinct(int[] counts) {
+        int count = 0;
+        for (int c : counts) if (c > 0) count++;
+        return count;
+    }
+
+    private void decrementOneFromEach(int[] counts) {
+        for (int i = 0; i < counts.length; i++) {
+            if (counts[i] > 0) counts[i]--;
+        }
     }
 
     private void optimize(List<Integer> groups) {
+        // Replace 5 + 3 with 4 + 4 (better discount: 320 instead of 322.5)
         while (groups.contains(5) && groups.contains(3)) {
             groups.remove(Integer.valueOf(5));
             groups.remove(Integer.valueOf(3));
             groups.add(4);
             groups.add(4);
         }
+    }
+
+    private double calculateTotalCost(List<Integer> groups) {
+        double totalCost = 0.0;
+        for (int size : groups) {
+            double discount = properties.getDiscounts().getOrDefault(size, 0.0);
+            totalCost += size * BOOK_PRICE * (1 - discount);
+        }
+        return totalCost;
     }
 }
