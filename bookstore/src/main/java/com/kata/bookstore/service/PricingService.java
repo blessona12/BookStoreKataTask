@@ -1,5 +1,6 @@
 package com.kata.bookstore.service;
 
+import com.kata.bookstore.config.DiscountProperties;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -9,7 +10,11 @@ import java.util.List;
 public class PricingService {
 
     private static final double BOOK_PRICE = 50.0;
-    private static final double[] DISCOUNT_RATES = {0.0, 0.0, 0.05, 0.10, 0.20, 0.25};
+    private final DiscountProperties properties;
+
+    public PricingService(DiscountProperties properties) {
+        this.properties = properties;
+    }
 
     public double calculate(int[] counts) {
         if (counts == null || counts.length != 5) {
@@ -25,10 +30,7 @@ public class PricingService {
             return 0.0;
         }
 
-        // Make a working copy
         int[] currentCounts = counts.clone();
-
-        // Collect group sizes first
         List<Integer> groups = new ArrayList<>();
 
         while (true) {
@@ -37,13 +39,10 @@ public class PricingService {
                 if (c > 0) distinct++;
             }
 
-            if (distinct == 0) {
-                break;
-            }
+            if (distinct == 0) break;
 
             groups.add(distinct);
 
-            // Remove one copy from each available book
             for (int i = 0; i < currentCounts.length; i++) {
                 if (currentCounts[i] > 0) {
                     currentCounts[i]--;
@@ -53,10 +52,9 @@ public class PricingService {
 
         optimize(groups);
 
-        // Calculate final price
         double totalCost = 0.0;
         for (int size : groups) {
-            double discount = DISCOUNT_RATES[size];
+            double discount = properties.getDiscounts().getOrDefault(size, 0.0);
             totalCost += size * BOOK_PRICE * (1 - discount);
         }
 
